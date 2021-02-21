@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    build: ./app
+    environment:
+      - LOAD_OPTION=$ENV_LOAD_OPTION
+    ports:
+      - "5000:5000"
+    volumes:
+      - ".:/app:rw"
+    links:
+      - db
+  db:
+    build: ./db
