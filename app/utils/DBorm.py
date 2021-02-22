@@ -1,16 +1,19 @@
-from app.app import db
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+
+Base = declarative_base()
 
 
-class PersonModel(db.Model):
+class PersonModel(Base):
 
     __tablename__ = "person"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    first_name = db.Column(db.String())
-    last_name = db.Column(db.String())
-    email = db.Column(db.String())
-    address = db.Column(db.String())
-    skills = db.Column(db.String())
+    id = Column(Integer(), primary_key=True)
+    first_name = Column(String())
+    last_name = Column(String())
+    email = Column(String())
+    address = Column(String())
+    skills = Column(String())
 
     def __init__(self, first_name, last_name, email, address, skills):
         self.first_name = first_name
@@ -20,19 +23,21 @@ class PersonModel(db.Model):
         self.skills = skills
 
     def __repr__(self):
-        return f"< Person {self.first_name}>"
+        return "<Person(id= {" + str(self.id) + "}, first_name={"+self.first_name + "}, last_name={"\
+                                      + self.last_name + "}, email={" + self.email + "})>"
 
 
-class ProjectModel(db.Model):
+
+class ProjectModel(Base):
 
     __tablename__ = "project"
 
-    id = db.Column(db.Integer(), primary_key=True)
-    project_name = db.Column(db.String())
-    date_posted = db.Column(db.String())
-    department = db.Column(db.String())
-    description = db.Column(db.String())
-    skills = db.Column(db.String())
+    id = Column(Integer(), primary_key=True)
+    project_name = Column(String())
+    date_posted = Column(String())
+    department = Column(String())
+    description = Column(String())
+    skills = Column(String())
 
     def __init__(self, project_name, date_posted, department, description, skills):
         self.project_name = project_name
@@ -42,5 +47,7 @@ class ProjectModel(db.Model):
         self.skills = skills
 
     def __repr__(self):
-        return f"< Project {self.project_name}>"
+        return "< Project( project_name={" + self.project_name + \
+               " date_posted={" + self.date_posted + "} department={" + self.department + \
+               "description={" + self.description + "} skills={" + self.skills + "}>"
 

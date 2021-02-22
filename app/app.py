@@ -7,6 +7,9 @@ from utils.ingestion_scripts import *
 from sqlalchemy import create_engine
 from utils.GlobalConfig import get_logger
 import os
+from utils.curd import Session, load_person, load_projects
+from utils.DBorm import PersonModel, ProjectModel
+import time
 
 db_name = "database"
 db_user = "username"
@@ -20,28 +23,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_string
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
 db_engine = create_engine(db_string)
-
-
-def load_projects():
-    json_file = './data/projects.json'
-    file_length = (len(open(json_file, 'r').readlines()))
-    with open(json_file, 'r') as f:
-        for i in range(file_length):
-            text = f.readline()
-            json_text = json.loads(text)
-            insert_project_data(json_text)
-
-
-def load_person():
-    json_file = './data/people.json'
-    file_length = (len(open(json_file, 'r').readlines()))
-    with open(json_file, 'r') as f:
-        for i in range(file_length):
-            text = f.readline()
-            json_text = json.loads(text)
-            insert_person_data(json_text)
+s = Session()
 
 
 def find_matching_person(skills_list):
@@ -57,7 +40,7 @@ def find_matching_person(skills_list):
         group by 1
         order by 2 desc
         limit 5
-    """#.format(skills_list)
+    """
 
     # print("skill_list is: " + skills_list)
 
@@ -94,13 +77,13 @@ def insert_project_data(data):
                                department=data['department'],
                                description=data['description'],
                                skills=data['skills'])
-    db.session.add(new_project)
-    db.session.commit()
+    s.add(new_project)
+    s.commit()
     return new_project
 
 
 def query_project_data(request_id):
-    projects = ProjectModel.query.get(request_id)
+    projects = s.query(ProjectModel).get(request_id)
     results = [
         {
             "project_name": projects.project_name,
@@ -110,16 +93,6 @@ def query_project_data(request_id):
             "skills": projects.skills
         }]
 
-    # projects_all = ProjectModel.query.all()
-    # results_all = [
-    #     {
-    #         "project_name": project_all.project_name,
-    #         "date_posted": project_all.date_posted,
-    #         "department": project_all.department,
-    #         "description": project_all.description,
-    #         "skills": project_all.skills,
-    #         "id": project_all.id
-    #     } for project_all in projects_all]
     return results
 
 
@@ -129,13 +102,14 @@ def insert_person_data(data):
                              email=data['email'],
                              address=data['address'],
                              skills=data['skills'])
-    db.session.add(new_person)
-    db.session.commit()
+    s.add(new_person)
+    s.commit()
     return new_person
 
 
 def query_person_data(request_id):
-    person = PersonModel.query.get(request_id)
+    person = s.query(PersonModel).get(request_id)
+
     results = [
         {
             "first_name": person.first_name,
@@ -145,51 +119,6 @@ def query_person_data(request_id):
             "skills": person.skills
         }]
     return results
-
-
-class PersonModel(db.Model):
-
-    __tablename__ = "person"
-
-    id = db.Column(db.Integer(), primary_key=True)
-    first_name = db.Column(db.String())
-    last_name = db.Column(db.String())
-    email = db.Column(db.String())
-    address = db.Column(db.String())
-    skills = db.Column(db.String())
-
-    def __init__(self, first_name, last_name, email, address, skills):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.address = address
-        self.skills = skills
-
-    def __repr__(self):
-        return f"< Person {self.first_name}>"
-
-
-class ProjectModel(db.Model):
-
-    __tablename__ = "project"
-
-    id = db.Column(db.Integer(), primary_key=True)
-    project_name = db.Column(db.String())
-    date_posted = db.Column(db.String())
-    department = db.Column(db.String())
-    description = db.Column(db.String())
-    skills = db.Column(db.String())
-
-    def __init__(self, project_name, date_posted, department, description, skills):
-        self.project_name = project_name
-        self.date_posted = date_posted
-        self.department = department
-        self.description = description
-        self.skills = skills
-
-    def __repr__(self):
-        return f"< Project {self.project_name}>"
-
 
 @app.route('/')
 def hello_world():
@@ -233,8 +162,8 @@ def handle_project():
     elif request.method == 'GET':
         request_data = request.get_json()
         request_id = request_data['id']
-        results, results_all = query_project_data(request_id)
-        return {"count": len(results), "projects": results, "project_all": results_all, "message": "success"}
+        results = query_project_data(request_id)
+        return {"count": len(results), "projects": results,  "message": "success"}
 
 
 @app.route('/get_match', methods=['GET'])
@@ -258,3 +187,4 @@ def match_project_with_person():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
+
