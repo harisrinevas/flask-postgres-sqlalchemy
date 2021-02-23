@@ -11,6 +11,14 @@
 
 5) To stop the server either use docker-compose down or run 'tear_down.sh' script
 
+6) By default the BULK_LOAD option is set in .env file, which means when the first API call is made 
+all the records from the JSON files would be uploaded. API allows duplicate insert, hence the GET and POST action 
+to add/ retreive data can be performed even after the bulk load. BULK_LOAD option is to support 
+"Get match" API (to match people to projects) as soon as the server starts.
+
+7) "Get match" API gets top 5 matches for the project
+
+
 
 ## Considerations and assumption
 1) Code was developed with enabling the core functionality of the API (GET/POST for person,project and 
@@ -24,3 +32,4 @@ all probable scenarios
 covered
 
 4) API does not support POST with a json file
+
