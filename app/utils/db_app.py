@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import json
 
-
+# Housekeeping
 db_name = "database"
 db_user = "username"
 db_password = "secret"
@@ -17,6 +17,7 @@ person_json = './data/people.json'
 engine = create_engine(db_string)
 Session = sessionmaker(bind=engine)
 
+# create a session and close it clean
 @contextmanager
 def session_scope():
     session = Session()
@@ -30,6 +31,7 @@ def session_scope():
         session.close()
 
 
+# bulk load person by reading the data in file person_json file
 def load_person():
     with session_scope() as s:
         for person in get_json(person_json):
@@ -37,6 +39,7 @@ def load_person():
             s.add(new_person)
 
 
+# bulk load project by reading the data in file project_json file
 def load_projects():
     with session_scope() as s:
         for project in get_json(project_json):
@@ -44,6 +47,7 @@ def load_projects():
             s.add(new_project)
 
 
+# Helper function to read data from json file and return a list of JSON objects
 def get_json(json_file):
     file_length = (len(open(json_file, 'r').readlines()))
     json_list =[]
@@ -55,6 +59,7 @@ def get_json(json_file):
     return json_list
 
 
+# SQL to identify person with most matching skills for a given project
 def find_matching_person(db_engine, s, skills_list):
     skills_list = ','.join("'"+str(skill)+"'" for skill in skills_list)
     query = """
@@ -79,6 +84,7 @@ def find_matching_person(db_engine, s, skills_list):
     return result_list
 
 
+# Helper Function get person based on list of ids. Takes list of IDs as argument and returns data for each person
 def get_person_list(s, id_list):
     person_list = []
     for person_id in id_list:
@@ -86,6 +92,7 @@ def get_person_list(s, id_list):
     return person_list
 
 
+# Helper function to get skills od a project based on project ID
 def get_project_skills(s, project_id):
     project = s.query(ProjectModel).get(project_id)
     if project is not None:
@@ -93,7 +100,8 @@ def get_project_skills(s, project_id):
     else:
         return None
 
-
+# Function to support post operation. Insert the data posted to the API.
+# Takes person data as input argument and returns the same data (with ID) if successful
 def insert_project_data(s, data):
     new_project = ProjectModel(project_name=data['project_name'],
                                date_posted=data['date_posted'],
@@ -105,6 +113,8 @@ def insert_project_data(s, data):
     return new_project
 
 
+# Helper function to GET project record based on project id.
+# Takes project ID as input argument and return columns from project table.
 def query_project_data(s, request_id):
     projects = s.query(ProjectModel).get(request_id)
     if projects is not None:
@@ -120,7 +130,8 @@ def query_project_data(s, request_id):
     else:
         return None
 
-
+# Function to support POST operation. Insert the data posted to the API.
+# Takes project data as input argument and returns the same data (with ID) if successful
 def insert_person_data(s, data):
     new_person = PersonModel(first_name=data['first_name'],
                              last_name=data['last_name'],
@@ -132,6 +143,8 @@ def insert_person_data(s, data):
     return new_person
 
 
+# Helper function to GET project record based on project id.
+# Takes project ID as input argument and return columns from project table.
 def query_person_data(s, request_id):
     person = s.query(PersonModel).get(request_id)
     if person is not None:

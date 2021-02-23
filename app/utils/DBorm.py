@@ -3,11 +3,11 @@ from sqlalchemy import Column, Integer, String
 
 Base = declarative_base()
 
-
+#Base model for Person - Mapping to the person table
 class PersonModel(Base):
 
     __tablename__ = "person"
-
+    # column mapping
     id = Column(Integer(), primary_key=True)
     first_name = Column(String())
     last_name = Column(String())
@@ -27,11 +27,11 @@ class PersonModel(Base):
                                       + self.last_name + "}, email={" + self.email + "})>"
 
 
-
+#Base model for Person - Mapping to the project table
 class ProjectModel(Base):
 
     __tablename__ = "project"
-
+    # column mapping
     id = Column(Integer(), primary_key=True)
     project_name = Column(String())
     date_posted = Column(String())

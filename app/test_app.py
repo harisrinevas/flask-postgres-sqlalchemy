@@ -1,18 +1,10 @@
-from unittest import TestCase
 import unittest
-import json
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from utils.ingestion_scripts import *
 from sqlalchemy import create_engine
-from utils.GlobalConfig import get_logger
-import os
-from utils.curd import *
+from utils.db_app import *
 from app import app
 from flask_testing import TestCase
-import requests
-import responses
+
 
 class UnitTestApp(TestCase):
     @classmethod
@@ -174,23 +166,10 @@ class UnitTestApp(TestCase):
         get_response = app_url.post('/person', data=data_person)
         self.assertEqual(get_response.status_code, 200, "match found")
 
-    def test_post_project(self):
-        self.s.query(ProjectModel).delete()
-        data_project = {
-            "project_name": "Finding Sherlock",
-            "department": "Investigation",
-            "description": "This is a test project",
-            "date_posted": "12/25/2019",
-            "skills": ["python", "postgres", "docker"]
-        }
-        app_url = self.app.test_client()
-        get_response = app_url.post('/project', data=data_project)
-        self.assertEqual(get_response.status_code, 200, "match found")
-
     @classmethod
     def tearDown(cls) -> None:
         pass
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()
