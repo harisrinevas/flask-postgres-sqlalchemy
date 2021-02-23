@@ -12,7 +12,7 @@
 5) To stop the server either use docker-compose down or run 'tear_down.sh' script
 
 
-##Considerations and assumption
+## Considerations and assumption
 1) Code was developed with enabling the core functionality of the API (GET/POST for person,project and 
 GET for person matching the project). The container is not reverse proxy or a production grade
  WSGI server 
