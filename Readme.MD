@@ -1,9 +1,9 @@
 # Denstu Engineering Challenge
 
 ## Executing the code
-1)Unzip the 'Dentsu_DE_Challenge.zip' file  and extract files
+1) Unzip the 'Dentsu_DE_Challenge.zip' file  and extract files
 
-2)open docker terminal and navigate to the folder where docker-compose.yml is present
+2) open docker terminal and navigate to the folder where docker-compose.yml is present
 
 3) Either run using docker-compose up command or run the 'deploy.sh' script to bring the API server up
 
